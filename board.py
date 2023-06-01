@@ -29,11 +29,17 @@ class Board:
     def reset_board(self):
         # 實現遊戲盤面的初始化邏輯
         self.board = copy.deepcopy(self.initboard)
+    def boardstring(self):
+        boardstring = ""
+        for row in range(self.rows):
+            for col in range(self.cols):
+                boardstring = boardstring+ self.board[row][col]
+        return boardstring
         
 
     def generate_random_gem(self):
         # 生成隨機珠子的邏輯，這裡假設有6種不同的珠子
-        gem_types = ["A", "B", "C", "D", "E", "F"]
+        gem_types = ["R", "G", "B", "L", "D", "H"]
         return random.choice(gem_types)
 
     def display_board(self):
@@ -55,13 +61,13 @@ class Board:
             for item in movestring:
                 next_row = now_row
                 next_col = now_col
-                if item=='1':
+                if item=='0':
                     next_row = now_row + 1
-                elif item=='2':
+                elif item=='1':
                     next_col = now_col + 1
-                elif item=='3':
+                elif item=='2':
                     next_row = now_row - 1
-                elif item=='4':
+                elif item=='3':
                     next_col = now_col - 1
                 if next_row>=0 and self.rows>next_row and next_col>=0 and self.cols>next_col:
                     self.board[now_row][now_col],self.board[next_row][next_col] = self.board[next_row][next_col],self.board[now_row][now_col]
@@ -153,8 +159,8 @@ class Board:
                     self.board[row][col] = None
 
     def cpmpute_scroce(self):
-        self.display_board()
-        print("----------------------------")
+        # self.display_board()
+        # print("----------------------------")
         
         weight = [1.25,1.25,1.25,1.25,1.25,1.25],[1.25,1,1,1,1,1.25],[1.25,1,0.75,0.75,1,1.25],[1.25,1,1,1,1,1.25],[1.25,1.25,1.25,1.25,1.25,1.25]
         
@@ -168,7 +174,7 @@ class Board:
         time = 0
         while len(matches) !=0:
             time += 1
-            print(f"#目前版面可消除")
+            # print(f"#目前版面可消除")
             if time == 1:
                 combo_count,ball_count,ball_score,ball_weightscore=self.remove_matches(weight)
             else:
@@ -177,25 +183,27 @@ class Board:
             sum_ball_count += ball_count
             sum_ball_score += ball_score
             sum_ball_weightscore += ball_weightscore
-            print(f"第{time}次消除,連擊數:{combo_count},消除珠子數量:{ball_count},珠子倍率:{ball_score},珠子加權倍率:{ball_weightscore}")
-            self.display_board()
+            # print(f"第{time}次消除,連擊數:{combo_count},消除珠子數量:{ball_count},珠子倍率:{ball_score},珠子加權倍率:{ball_weightscore}")
+            # self.display_board()
             self.fill_board()
-            self.display_board()
+            # self.display_board()
             matches =  self.check_matches()
             
-        print(f"#目前版面無法消除")
+        # print(f"#目前版面無法消除")
         scroce_loss = self.cpmpute_scroce_loss()
         maybe_combo_score,maybe_ball_score = self.cpmpute_scroce_loss2()
         if sum_combo_count>0:
             sum_combo_score = 1+(sum_combo_count-1)/4
-        print(f"總連擊:{sum_combo_count},總消除珠子數量:{sum_ball_count},連擊倍率:{sum_combo_score},珠子倍率:{sum_ball_score},珠子加權倍率:{sum_ball_weightscore},潛力連擊倍率:{maybe_combo_score},潛力珠子倍率:{maybe_ball_score},\n實際倍率:{sum_combo_score*sum_ball_score},潛力倍率:{-1*maybe_combo_score*maybe_ball_score},剩餘版面價值:{scroce_loss}")
+        # print(f"總連擊:{sum_combo_count},總消除珠子數量:{sum_ball_count},連擊倍率:{sum_combo_score},珠子倍率:{sum_ball_score},珠子加權倍率:{sum_ball_weightscore},潛力連擊倍率:{maybe_combo_score},潛力珠子倍率:{maybe_ball_score},\n實際倍率:{sum_combo_score*sum_ball_score},潛力倍率:{-1*maybe_combo_score*maybe_ball_score},剩餘版面價值:{scroce_loss}")
         # 消除的分數
-        cost_part1 = sum_combo_score*sum_ball_score
+        # cost_part1 = sum_combo_score*sum_ball_score
+        cost_part1 = sum_combo_score*sum_ball_weightscore
         # 可消除但未消除的分數
-        cost_part2 = -1*maybe_combo_score*maybe_ball_score
+        cost_part2 = -1*maybe_combo_score*maybe_ball_score + 32.5
         # 最後剩下版面的整潔度
         cost_part3 = scroce_loss
-        print(f"評價函數:{cost_part1+cost_part2+cost_part3}")
+        # print(f"評價函數:{cost_part1+cost_part2+cost_part3}")
+        return (cost_part1+cost_part2+cost_part3)
 
     def cpmpute_scroce_loss(self):
         # 評估剩餘版面價值
@@ -265,19 +273,3 @@ class Board:
     def play_game(self):
         # 遊戲主循環
         pass
-
-
-def main():
-    seed_value = 11
-    random.seed(seed_value)
-    board = Board()
-    board.initialize_board()
-    board.cpmpute_scroce() 
-    board.cpmpute_scroce_loss() 
-    # board.reset_board()  
-    # board.display_board()
-    # board.make_move( 0,0,"1")
-    # board.display_board()
-    
-if __name__ == "__main__":
-    main()
