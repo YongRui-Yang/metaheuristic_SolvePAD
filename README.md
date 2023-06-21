@@ -40,3 +40,4 @@ python Exp4_3s.py  # 運行 Exp4 程式碼
 # 具體專案內容與實驗結果請參照 
 * 超啟發演算法專題報告.pdf
 * experimental_data/實驗結果整理.xlsx
+* 最新進度Github:[metaheuristic_SolvePAD](https://github.com/YongRui-Yang/metaheuristic_SolvePAD)
